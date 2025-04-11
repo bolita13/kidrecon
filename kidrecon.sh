@@ -396,73 +396,22 @@ echo -e "${LIGHT_CYAN}🔥 Creating output directory 'urls'...${RESET}"
 sleep 1
 
 
-
-
-# Define window size 
-width=600
-height=300
-margin=10
-top=0
-bottom=600
-offset_bottom=150  
-
-type_message() {
-    local message="$1"
-    local delay=0.05  # Delay between characters
-
-    for (( i=0; i<${#message}; i++ )); do
-        echo -n "${message:$i:1}"
-        sleep $delay
-    done
-    echo
-}
-
-
 type_message "🚀 Extracting URLs from various sources and saving them to 'urls' directory..."
 
 type_message "🌐 Fetching historical URLs with waybackurls..."
-xterm -T "Waybackurls" -e "bash -c 'cat https_domins.txt | waybackurls | anew urls/waybackurls.txt; sleep 4; exit'" &
+-c 'cat https_domins.txt | waybackurls | anew urls/waybackurls.txt; sleep 4; exit'" &
 wayback_pid=$!
 
 
 type_message "🔧 Processing endpoints with paramspider..."
-xterm -T "Paramspider" -e "bash -c 'paramspider -l https_domins.txt -o output ; sleep 4; exit' " &
+-c 'paramspider -l https_domins.txt -o output ; sleep 4; exit' " &
 paramspider_pid=$!
 
 type_message "🔫 Processing URLs with katana..."
-xterm -T "Katana" -e "bash -c 'katana -list domins.txt -fx -ps -d 5 -pss waybackarchive,commoncrawl,alienvault -jc | anew urls/katana_urls.txt; sleep 4; exit'" &
+-c 'katana -list domins.txt -fx -ps -d 5 -pss waybackarchive,commoncrawl,alienvault -jc | anew urls/katana_urls.txt; sleep 4; exit'" &
 katana_pid=$!
 
 sleep 4
-
-# using xdotool
-wayback_window=$(xdotool search --pid $wayback_pid)
-paramspider_window=$(xdotool search --pid $paramspider_pid)
-katana_window=$(xdotool search --pid $katana_pid)
-
-# resize windows
-move_and_resize() {
-    local window_id=$1
-    local x=$2
-    local y=$3
-    local w=$4
-    local h=$5
-
-    if [ -n "$window_id" ]; then
-        xdotool windowmove "$window_id" "$x" "$y"
-        xdotool windowsize "$window_id" "$w" "$h"
-    else
-        echo "Error: Window ID not found Or Tool Finish "
-    fi
-}
-
-# Top
-move_and_resize "$wayback_window" 0 $top $width $height
-
-# Bottom
-move_and_resize "$paramspider_window" $((width + margin)) $((height + margin + offset_bottom)) $width $height
-move_and_resize "$katana_window" $((2 * width + 2 * margin)) $((height + margin + offset_bottom)) $width $height
-
 
 type_message " Happy Hacking ^_^ - Wait little dont Close any windows  "
 
